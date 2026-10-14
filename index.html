@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تحدي XO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#FBF3E3; --paper:#FFFDF8; --sand:#EFE6D3; --line:#E0D3BA;
+  --ink:#3A2A1E; --muted:#7B6A5B;
+  --sage:#93AE90; --sage-d:#4D6A52; --brown:#8C5A36; --brown-l:#C9A27E;
+  --on-primary:#FFFDF8;
+  --x:#9A5530; --o:#47684D; --x-soft:#F3E3D6; --o-soft:#DFEADC;
+  --ok:#3F6A47; --ok-soft:#DCEBD9; --bad:#A4473A; --bad-soft:#F5DEDA;
+  --c0:#E2EBDC; --c1:#DAE6E2; --c2:#F3E1CF; --c3:#EEE5CE; --c4:#F0DCD4;
+  --c5:#E5E6CC; --c6:#DCE3E8; --c7:#F2E8D0; --c8:#E7DACB;
+  --shadow:0 1px 0 rgba(58,42,30,.06), 0 10px 26px -14px rgba(58,42,30,.35);
+  --display:'Baloo Bhaijaan 2', 'IBM Plex Sans Arabic', sans-serif;
+  --sage-l:#A9C7A6; --cell-ink:#86B087; --mark:#7F4A35; --win-bg:rgba(127,74,53,.07); --deco:#A9C7A6; --deco-d:#8DB08A;
+  --body:'IBM Plex Sans Arabic', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme: dark;
+    --bg:#1F1813; --paper:#2A211A; --sand:#352A21; --line:#4A3B2E;
+    --ink:#F2E8D8; --muted:#BFAE9A;
+    --sage:#7E9A7B; --sage-d:#A9C6A6; --brown:#D3A47D; --brown-l:#8C6A4E;
+    --on-primary:#1F1813;
+    --x:#E59C72; --o:#9CC79F; --x-soft:#3E2C21; --o-soft:#26332A;
+    --ok:#9CC79F; --ok-soft:#26372A; --bad:#EE958A; --bad-soft:#43271F;
+    --c0:#2D3729; --c1:#283431; --c2:#3D2F24; --c3:#3A3324; --c4:#3D2C27;
+    --c5:#34352A; --c6:#2A3136; --c7:#3B3424; --c8:#382D25;
+    --shadow:0 1px 0 rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.7);
+    --sage-l:#55705A; --cell-ink:#9CC79F; --mark:#E39B77; --win-bg:rgba(227,155,119,.1); --deco:#3C5040; --deco-d:#2E3F32;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;min-height:100vh}
+body.lock{overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--brown);outline-offset:2px}
+[hidden]{display:none!important}
+.screen{min-height:100vh}
+
+/* ---------- buttons ---------- */
+.btn{border:2px solid var(--line);background:var(--paper);border-radius:12px;padding:.55em 1.1em;font-weight:600;transition:transform .15s,background .15s,border-color .15s}
+.btn:hover:not(:disabled){border-color:var(--sage);transform:translateY(-1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{background:var(--sage-d);border-color:var(--sage-d);color:var(--on-primary)}
+.btn.primary:hover:not(:disabled){border-color:var(--sage-d);filter:brightness(1.08)}
+.btn.big{font-size:1.15rem;padding:.7em 1.6em;border-radius:14px}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:var(--on-primary)}
+.btn.bad{background:var(--bad);border-color:var(--bad);color:var(--on-primary)}
+.btn.ghost{background:transparent}
+.btn.small{font-size:.9rem;padding:.4em .85em;border-radius:10px}
+.btn.danger{color:var(--bad)}
+
+/* ---------- marks ---------- */
+.mark{width:100%;height:100%;fill:none;stroke-linecap:round;stroke-width:11;display:block}
+.mx{stroke:var(--x)} .mo{stroke:var(--o)}
+.mo circle{transform:rotate(-90deg);transform-origin:50% 50%}
+.draw path,.draw circle{stroke-dasharray:100;stroke-dashoffset:100;animation:draw .45s ease-out forwards}
+.draw path:nth-child(2){animation-delay:.25s}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+/* ---------- start ---------- */
+#start{display:grid;place-items:center;padding:32px 18px}
+.start-wrap{width:min(560px,100%);text-align:center}
+.hero{display:flex;align-items:center;justify-content:center;gap:clamp(10px,3vw,22px);margin-bottom:6px}
+.hero h1{font-family:var(--display);font-weight:400;font-size:clamp(64px,13vw,118px);line-height:1;margin:0;color:var(--brown);padding-top:.12em}
+.hero .hm{width:clamp(58px,11vw,96px);height:clamp(58px,11vw,96px)}
+.hero .hm:nth-of-type(2) .draw circle{animation-delay:.55s}
+.tagline{font-size:clamp(17px,2.4vw,20px);color:var(--muted);margin:6px auto 26px;max-width:30ch}
+.card{background:var(--paper);border:1.5px solid var(--line);border-radius:22px;padding:24px;box-shadow:var(--shadow);text-align:right}
+.teams-in{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:.95rem}
+.field input,.field select,.field textarea{background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:.6em .8em;font-weight:500;width:100%}
+.field input:focus,.field select:focus{border-color:var(--sage);outline:none}
+.tin{position:relative}
+.tin .lead{display:flex;align-items:center;gap:8px}
+.tin .lead svg{width:22px;height:22px}
+.row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.opt-line{margin-top:18px;padding-top:16px;border-top:1.5px dashed var(--line);display:flex;flex-direction:column;gap:14px}
+.seg{display:inline-flex;background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:3px}
+.seg button{border:0;background:transparent;border-radius:9px;padding:.35em 1em;font-weight:600;display:flex;align-items:center;gap:6px}
+.seg button svg{width:18px;height:18px}
+.seg button[aria-pressed="true"]{background:var(--paper);box-shadow:var(--shadow)}
+.switch{display:inline-flex;align-items:center;gap:10px;font-weight:600;cursor:pointer}
+.switch input{width:20px;height:20px;accent-color:var(--sage-d)}
+.num{width:84px!important;text-align:center}
+.start-actions{display:flex;flex-direction:column;gap:12px;margin-top:22px;align-items:stretch}
+.label-sm{font-weight:600;font-size:.95rem}
+
+/* ---------- game ---------- */
+#game{padding:16px clamp(12px,2.5vw,32px) 28px;display:flex;flex-direction:column;gap:16px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{font-family:var(--display);font-size:30px;color:var(--brown);line-height:1;padding-top:6px}
+.tools-row{display:flex;gap:8px;flex-wrap:wrap}
+.turn-pill{display:inline-flex;align-items:center;gap:10px;padding:.45em 1.1em;border-radius:999px;background:var(--sand);font-size:clamp(17px,2vw,22px);font-weight:600;border:2px solid transparent}
+.turn-pill .pm{width:26px;height:26px;display:inline-block}
+.turn-pill.tX{background:var(--x-soft);border-color:var(--x)}
+.turn-pill.tO{background:var(--o-soft);border-color:var(--o)}
+.arena{display:grid;grid-template-columns:minmax(170px,1fr) auto minmax(170px,1fr);gap:clamp(14px,2.5vw,36px);align-items:center;flex:1}
+.team{background:var(--paper);border:2px solid var(--line);border-radius:22px;padding:20px;text-align:center;transition:border-color .2s, box-shadow .2s, transform .2s}
+.team .tm{width:clamp(54px,6vw,84px);height:clamp(54px,6vw,84px);margin:0 auto 6px}
+.team h2{margin:0 0 8px;font-size:clamp(18px,2vw,26px);line-height:1.35;word-break:break-word}
+.team .stats{display:flex;justify-content:center;gap:16px;color:var(--muted);font-size:.95rem}
+.team .stats b{display:block;font-size:clamp(26px,3vw,40px);color:var(--ink);font-family:var(--display);font-weight:400;line-height:1.1}
+.team.active.tX{border-color:var(--x);box-shadow:0 0 0 5px var(--x-soft)}
+.team.active.tO{border-color:var(--o);box-shadow:0 0 0 5px var(--o-soft)}
+.team.active{transform:translateY(-3px)}
+.team .now{display:inline-block;margin-top:10px;font-size:.85rem;font-weight:600;padding:.15em .8em;border-radius:999px;visibility:hidden}
+.team.active .now{visibility:visible}
+.team.tX .now{background:var(--x-soft);color:var(--x)}
+.team.tO .now{background:var(--o-soft);color:var(--o)}
+
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,1.3vw,16px);width:min(88vw,66vh,640px);aspect-ratio:1;padding:clamp(8px,1.3vw,16px);background:var(--sand);border-radius:30px}
+.cell{border:2.5px solid transparent;background:var(--tint);border-radius:20px;display:grid;place-items:center;position:relative;padding:8px;font-weight:700;font-size:clamp(15px,2.3vw,27px);line-height:1.35;text-align:center;transition:transform .15s,border-color .15s,box-shadow .15s}
+.cell:hover:not(:disabled){transform:translateY(-3px);border-color:var(--sage-d);box-shadow:var(--shadow)}
+.cell:disabled{cursor:default}
+.cell .label{padding:0 4px}
+.cell.taken{background:var(--paper)}
+.cell.taken .mark{width:68%;height:68%}
+.cell .cname{position:absolute;bottom:6px;inset-inline:0;font-size:clamp(10px,1.1vw,14px);font-weight:500;color:var(--muted)}
+.cell.win{animation:pulse 1.2s ease-in-out infinite}
+.cell.win:has(.mx){border-color:var(--x);background:var(--x-soft)}
+.cell.win:has(.mo){border-color:var(--o);background:var(--o-soft)}
+@keyframes pulse{50%{transform:scale(1.04)}}
+.board-hint{color:var(--muted);text-align:center;margin:0;font-size:.95rem}
+
+/* ---------- question modal ---------- */
+.overlay{position:fixed;inset:0;background:rgba(40,28,20,.5);backdrop-filter:blur(4px);display:grid;place-items:center;padding:16px;z-index:40;overflow:auto}
+.sheet{background:var(--paper);border-radius:28px;width:min(880px,100%);padding:clamp(18px,3vw,34px);box-shadow:0 30px 60px -20px rgba(0,0,0,.5);animation:rise .28s ease-out;max-height:calc(100vh - 32px);overflow:auto}
+@keyframes rise{from{opacity:0;transform:translateY(14px) scale(.98)}}
+.q-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:.3em .95em;border-radius:999px;font-weight:600;background:var(--tint,var(--sand))}
+.team-chip svg{width:20px;height:20px}
+.team-chip.tX{background:var(--x-soft);color:var(--x)}
+.team-chip.tO{background:var(--o-soft);color:var(--o)}
+.timer{margin-inline-start:auto;display:flex;align-items:center;gap:10px;min-width:150px}
+.timer .tnum{font-family:var(--display);font-size:32px;line-height:1;padding-top:4px;min-width:2ch;text-align:center}
+.timer .tbar{flex:1;height:8px;background:var(--sand);border-radius:99px;overflow:hidden}
+.timer .tfill{height:100%;background:var(--sage-d);border-radius:99px;transition:width 1s linear}
+.timer.low .tnum{color:var(--bad)} .timer.low .tfill{background:var(--bad)}
+.timer.paused{opacity:.55}
+.q-text{font-size:clamp(23px,3.3vw,40px);font-weight:700;line-height:1.55;margin:22px 0 22px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{display:flex;align-items:center;gap:14px;text-align:right;background:var(--bg);border:2.5px solid var(--line);border-radius:16px;padding:16px 18px;font-size:clamp(18px,2.2vw,25px);font-weight:600;transition:border-color .15s,background .15s,transform .15s}
+.opt:hover:not(:disabled){border-color:var(--sage);transform:translateY(-2px)}
+.opt:disabled{cursor:default}
+.opt .ltr{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--sand);font-size:18px}
+.opt.sel{border-color:var(--brown);background:var(--x-soft)}
+.opt.correct{border-color:var(--ok);background:var(--ok-soft)}
+.opt.correct .ltr{background:var(--ok);color:var(--on-primary)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.oral-note{background:var(--bg);border:2px dashed var(--line);border-radius:14px;padding:12px 16px;color:var(--muted);margin:0}
+.answer-box{margin-top:14px;background:var(--ok-soft);border-radius:14px;padding:14px 18px;font-size:clamp(17px,2vw,22px)}
+.q-actions{margin-top:22px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.judge{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.judge .btn{font-size:1.1rem;padding:.65em 1.5em}
+.judge-hint{margin:0;color:var(--muted)}
+.fb{text-align:center;display:flex;flex-direction:column;gap:4px;animation:pop .35s ease-out}
+.fb strong{font-size:clamp(24px,3.2vw,36px)}
+.fb.ok strong{color:var(--ok)} .fb.bad strong{color:var(--bad)}
+.fb span{color:var(--muted);font-size:1.05rem}
+@keyframes pop{from{transform:scale(.85);opacity:0}}
+.teacher{margin-top:24px;padding-top:14px;border-top:1.5px dashed var(--line);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.teacher .tl{font-size:.88rem;color:var(--muted);font-weight:600;margin-inline-end:4px}
+
+/* ---------- result ---------- */
+.result-card{background:var(--paper);border-radius:30px;padding:clamp(24px,4vw,44px);width:min(620px,100%);text-align:center;animation:rise .35s ease-out;box-shadow:0 30px 60px -20px rgba(0,0,0,.5)}
+.r-marks{display:flex;justify-content:center;gap:12px}
+.r-marks svg{width:92px;height:92px}
+.r-marks svg:nth-child(2) circle{animation-delay:.4s}
+.result-card h2{font-family:var(--display);font-weight:400;font-size:clamp(34px,5.5vw,54px);line-height:1.25;margin:10px 0 2px;color:var(--brown)}
+.r-sub{color:var(--muted);margin:0 0 22px}
+.scores{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.score{border-radius:18px;padding:14px;border:2px solid transparent}
+.score.tX{background:var(--x-soft)} .score.tO{background:var(--o-soft)}
+.score.won.tX{border-color:var(--x)} .score.won.tO{border-color:var(--o)}
+.score .sn{font-weight:700;font-size:1.1rem;word-break:break-word}
+.score .sv{font-family:var(--display);font-size:42px;line-height:1.1}
+.score .sl{font-size:.9rem;color:var(--muted)}
+.r-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* ---------- confirm & toast ---------- */
+#confirm{z-index:70}
+.confirm-card{background:var(--paper);border-radius:22px;padding:24px;width:min(420px,100%);text-align:center;animation:rise .2s ease-out}
+.confirm-card p{font-size:1.1rem;font-weight:600;margin:0 0 18px}
+.confirm-card .row{justify-content:center}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:.65em 1.3em;border-radius:12px;z-index:90;font-weight:600;max-width:92vw;text-align:center;animation:rise .2s ease-out}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+.confetti i{position:absolute;top:-24px;width:10px;height:15px;border-radius:3px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(112vh) rotate(600deg)}}
+
+/* ---------- editor ---------- */
+#editor{padding:20px clamp(12px,3vw,32px) 40px}
+.ed-wrap{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.ed-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.ed-head h1{font-family:var(--display);font-weight:400;font-size:clamp(30px,4vw,42px);color:var(--brown);margin:0;line-height:1.2;padding-top:6px}
+.ed-head p{margin:0;color:var(--muted)}
+.ed-settings{display:flex;gap:22px;flex-wrap:wrap;align-items:center}
+.tabs{display:grid;grid-template-columns:repeat(9,minmax(100px,1fr));gap:8px;overflow-x:auto;padding-bottom:4px}
+.tab{border:2.5px solid transparent;background:var(--tint);border-radius:14px;padding:10px 8px;text-align:center;display:flex;flex-direction:column;gap:2px;font-weight:700;min-height:74px;justify-content:center}
+.tab.on{border-color:var(--sage-d);box-shadow:var(--shadow)}
+.tab .tcount{font-size:.8rem;font-weight:500;color:var(--muted)}
+.tab .tcount.empty{color:var(--bad);font-weight:700}
+.panel-head{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.grow{flex:1;min-width:220px}
+.qitem{border:2px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.qitem.invalid{border-style:dashed;border-color:var(--brown-l)}
+.qi-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.qi-head select{background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:.3em .6em}
+.qi-warn{font-size:.85rem;color:var(--bad);font-weight:600}
+.qi-head .btn{margin-inline-start:auto}
+.qitem textarea,.qitem input[data-f]{background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:.55em .8em;width:100%;resize:vertical}
+.qitem input[type=radio]{width:20px;height:20px;accent-color:var(--ok);flex:none;margin:0}
+.opts-ed{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt-ed{display:flex;align-items:center;gap:8px}
+.hint{margin:0;color:var(--muted);font-size:.88rem}
+.empty-note{color:var(--muted);background:var(--bg);border:2px dashed var(--line);border-radius:14px;padding:16px;margin:0 0 12px}
+.ed-foot{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+
+@media (max-width:860px){
+  .arena{grid-template-columns:1fr 1fr;gap:12px}
+  .arena .board-col{grid-column:1/-1;order:3;display:flex;flex-direction:column;align-items:center;gap:10px}
+  .team{padding:12px}
+  .team .stats{gap:10px}
+  .board{width:min(94vw,640px)}
+}
+@media (max-width:560px){
+  .teams-in,.opts,.opts-ed{grid-template-columns:1fr}
+  .brand{font-size:24px}
+  .timer{min-width:110px}
+  .cell{border-radius:14px}
+}
+
+/* ===== reference look: outlined squares, brown marks, 3D shapes ===== */
+.screen{position:relative;z-index:1}
+.decor{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.decor .d{position:absolute;width:clamp(170px,24vw,360px);filter:drop-shadow(0 18px 18px rgba(80,100,70,.18))}
+.decor svg{display:block;width:100%;height:auto}
+.d1{top:-7%;left:-6%}
+.d2{top:-9%;right:-7%}
+.d3{bottom:-10%;left:-8%}
+.d4{bottom:-9%;right:-6%}
+.decor .px{position:absolute;width:30px;fill:var(--deco)}
+.p1{top:18%;right:16%} .p2{top:46%;left:9%} .p3{bottom:16%;right:20%}
+.hero h1,.brand,.team .stats b,.timer .tnum,.result-card h2,.ed-head h1,.score .sv{font-weight:800}
+.hero h1{line-height:1.45;padding-top:0}
+.hero{margin-bottom:18px}
+.board{background:transparent;padding:0;gap:clamp(10px,1.6vw,20px)}
+.board .cell{background:var(--bg);border:clamp(4px,.55vw,7px) solid var(--sage-l);border-radius:clamp(14px,1.8vw,24px);color:var(--cell-ink);font-family:var(--display);font-weight:800;font-size:clamp(20px,3.4vw,46px);line-height:1.3}
+.board .cell:hover:not(:disabled){border-color:var(--mark);box-shadow:none;transform:translateY(-2px)}
+.board .cell.taken{background:var(--bg)}
+.board .cell .mark{position:absolute;inset:4%;width:92%;height:92%;stroke:var(--mark);stroke-width:3.4;transform:scale(1.55);transform-origin:50% 50%}
+.board .cell.win{border-color:var(--mark);background:var(--win-bg)}
+@media (max-width:860px){
+  .decor .d{width:clamp(120px,34vw,220px);opacity:.45}
+  .decor .px{display:none}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}
+  .draw path,.draw circle{stroke-dashoffset:0}
+}
+</style>
+</head>
+<body>
+<div class="decor" aria-hidden="true"><span class="d d1"><svg viewBox="0 0 200 200" aria-hidden="true"><g transform="translate(7 10)" fill="var(--deco-d)"><g transform="rotate(45 100 100)"><rect x="74" y="8" width="52" height="184" rx="12"/><rect x="8" y="74" width="184" height="52" rx="12"/></g></g><g fill="var(--deco)"><g transform="rotate(45 100 100)"><rect x="74" y="8" width="52" height="184" rx="12"/><rect x="8" y="74" width="184" height="52" rx="12"/></g></g></svg></span><span class="d d2"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="107" cy="110" r="68" fill="none" stroke="var(--deco-d)" stroke-width="44"/><circle cx="100" cy="100" r="68" fill="none" stroke="var(--deco)" stroke-width="44"/></svg></span><span class="d d3"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="107" cy="110" r="68" fill="none" stroke="var(--deco-d)" stroke-width="44"/><circle cx="100" cy="100" r="68" fill="none" stroke="var(--deco)" stroke-width="44"/></svg></span><span class="d d4"><svg viewBox="0 0 200 200" aria-hidden="true"><g transform="translate(7 10)" fill="var(--deco-d)"><g transform="rotate(45 100 100)"><rect x="74" y="8" width="52" height="184" rx="12"/><rect x="8" y="74" width="184" height="52" rx="12"/></g></g><g fill="var(--deco)"><g transform="rotate(45 100 100)"><rect x="74" y="8" width="52" height="184" rx="12"/><rect x="8" y="74" width="184" height="52" rx="12"/></g></g></svg></span><span class="px p1"><svg viewBox="0 0 30 30" aria-hidden="true"><rect x="0" y="0" width="10" height="10"/><rect x="10" y="10" width="10" height="10"/><rect x="20" y="0" width="10" height="10" opacity=".6"/><rect x="0" y="20" width="10" height="10" opacity=".6"/></svg></span><span class="px p2"><svg viewBox="0 0 30 30" aria-hidden="true"><rect x="0" y="0" width="10" height="10"/><rect x="10" y="10" width="10" height="10"/><rect x="20" y="0" width="10" height="10" opacity=".6"/><rect x="0" y="20" width="10" height="10" opacity=".6"/></svg></span><span class="px p3"><svg viewBox="0 0 30 30" aria-hidden="true"><rect x="0" y="0" width="10" height="10"/><rect x="10" y="10" width="10" height="10"/><rect x="20" y="0" width="10" height="10" opacity=".6"/><rect x="0" y="20" width="10" height="10" opacity=".6"/></svg></span></div>
+
+<!-- ============ START ============ -->
+<section id="start" class="screen">
+  <div class="start-wrap">
+    <div class="hero">
+      <h1>تحدي</h1>
+      <span class="hm" id="heroX"></span>
+      <span class="hm" id="heroO"></span>
+    </div>
+    <p class="tagline">اختر التصنيف، أجب عن السؤال، واحجز مكانك في لوحة الفوز!</p>
+
+    <div class="card">
+      <div class="teams-in">
+        <label class="field tin"><span class="lead" id="leadX">اسم الفريق الأول</span>
+          <input id="teamX" maxlength="24" placeholder="فريق X"></label>
+        <label class="field tin"><span class="lead" id="leadO">اسم الفريق الثاني</span>
+          <input id="teamO" maxlength="24" placeholder="فريق O"></label>
+      </div>
+
+      <div class="opt-line">
+        <div class="row">
+          <span class="label-sm">يبدأ أولًا:</span>
+          <div class="seg" role="group" aria-label="الفريق الذي يبدأ">
+            <button type="button" data-first="X" id="segX"></button>
+            <button type="button" data-first="O" id="segO"></button>
+          </div>
+        </div>
+        <div class="row">
+          <label class="switch"><input type="checkbox" id="stTimerOn"> مؤقت للإجابة</label>
+          <label class="row" style="gap:8px"><input type="number" class="field num" id="stTimerSec" min="5" max="300" style="background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:.4em"> ثانية</label>
+        </div>
+      </div>
+
+      <div class="start-actions">
+        <button class="btn primary big" id="startBtn">ابدأ التحدي</button>
+        <button class="btn ghost" id="toEditor">إعداد التصنيفات والأسئلة</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GAME ============ -->
+<section id="game" class="screen" hidden>
+  <div class="topbar">
+    <div class="brand">تحدي X O</div>
+    <div class="turn-pill" id="turnPill" aria-live="polite"></div>
+    <div class="tools-row">
+      <button class="btn small" id="swapBtn" title="تغيير الفريق صاحب الدور">تبديل الدور</button>
+      <button class="btn small" id="undoBtn">تراجع عن آخر إجابة</button>
+      <button class="btn small" id="newRoundBtn">جولة جديدة</button>
+      <button class="btn small" id="settingsBtn">الأسئلة</button>
+      <button class="btn small" id="fsBtn">ملء الشاشة</button>
+      <button class="btn small danger" id="resetBtn">إعادة ضبط اللعبة</button>
+    </div>
+  </div>
+
+  <div class="arena">
+    <div class="team tX" id="cardX">
+      <div class="tm" id="tmX"></div>
+      <h2 id="nameX"></h2>
+      <div class="stats"><div><b id="cellsX">0</b>مربعات</div><div><b id="winsX">0</b>جولات</div></div>
+      <span class="now">دورهم الآن</span>
+    </div>
+    <div class="board-col">
+      <div class="board" id="board" aria-label="لوحة اللعبة"></div>
+    </div>
+    <div class="team tO" id="cardO">
+      <div class="tm" id="tmO"></div>
+      <h2 id="nameO"></h2>
+      <div class="stats"><div><b id="cellsO">0</b>مربعات</div><div><b id="winsO">0</b>جولات</div></div>
+      <span class="now">دورهم الآن</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EDITOR ============ -->
+<section id="editor" class="screen" hidden>
+  <div class="ed-wrap">
+    <div class="ed-head">
+      <div>
+        <h1>إعداد التصنيفات والأسئلة</h1>
+        <p>كل تعديل يُحفظ تلقائيًا على هذا الجهاز.</p>
+      </div>
+      <button class="btn primary" id="edBack">رجوع</button>
+    </div>
+
+    <div class="card ed-settings">
+      <label class="switch"><input type="checkbox" id="edTimerOn"> مؤقت للإجابة</label>
+      <label class="row" style="gap:8px"><input type="number" id="edTimerSec" min="5" max="300" class="num" style="background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:.4em"> ثانية</label>
+      <label class="switch"><input type="checkbox" id="edRandom"> اختيار الأسئلة عشوائيًا</label>
+      <label class="switch"><input type="checkbox" id="edConfirm"> تأكيد الإجابة بزر قبل احتسابها</label>
+    </div>
+
+    <div class="tabs" id="tabs" role="tablist" aria-label="التصنيفات"></div>
+    <div class="card" id="panel"></div>
+
+    <div class="ed-foot">
+      <div class="row">
+        <button class="btn small" id="exportBtn">تصدير الأسئلة (ملف)</button>
+        <button class="btn small" id="importBtn">استيراد أسئلة من ملف</button>
+        <input type="file" id="importFile" accept=".json,application/json" hidden>
+      </div>
+      <button class="btn small danger" id="defaultsBtn">استعادة الأسئلة التجريبية</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUESTION MODAL ============ -->
+<div class="overlay" id="qModal" hidden role="dialog" aria-modal="true" aria-labelledby="qText">
+  <div class="sheet">
+    <div class="q-head">
+      <span class="chip" id="qCat"></span>
+      <span class="chip team-chip" id="qTeam"></span>
+      <div class="timer" id="qTimer"><span class="tnum" id="tNum"></span><div class="tbar"><div class="tfill" id="tFill"></div></div></div>
+    </div>
+    <div class="q-text" id="qText"></div>
+    <div class="opts" id="qOpts"></div>
+    <p class="oral-note" id="qOralNote">سؤال شفهي: يجيب الفريق بصوت مسموع، ثم تحكم المعلمة على الإجابة.</p>
+    <div class="answer-box" id="qAnswer" hidden></div>
+    <div class="q-actions" id="qActions"></div>
+    <div class="teacher" id="tools">
+      <span class="tl">أدوات المعلمة:</span>
+      <button class="btn small" id="tPause">إيقاف المؤقت</button>
+      <button class="btn small" id="tSkip">سؤال آخر</button>
+      <button class="btn small" id="tReveal">إظهار الإجابة</button>
+      <button class="btn small" id="tRetry">إعادة السؤال</button>
+      <button class="btn small ghost" id="tClose">إغلاق دون احتساب</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ RESULT ============ -->
+<div class="overlay" id="result" hidden role="dialog" aria-modal="true" aria-labelledby="rTitle">
+  <div class="result-card">
+    <div class="r-marks" id="rMarks"></div>
+    <h2 id="rTitle"></h2>
+    <p class="r-sub" id="rSub"></p>
+    <div class="scores" id="rScores"></div>
+    <div class="r-actions">
+      <button class="btn primary big" id="rAgain">إعادة اللعب</button>
+      <button class="btn big" id="rSetup">العودة إلى الإعدادات</button>
+    </div>
+    <p style="margin:14px 0 0"><button class="btn small ghost" id="rUndo">تراجع عن آخر إجابة</button></p>
+  </div>
+</div>
+
+<!-- ============ CONFIRM ============ -->
+<div class="overlay" id="confirm" hidden role="alertdialog" aria-modal="true" aria-labelledby="cMsg">
+  <div class="confirm-card">
+    <p id="cMsg"></p>
+    <div class="row">
+      <button class="btn primary" id="cOk">متابعة</button>
+      <button class="btn" id="cCancel">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= helpers ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2, 10);
+const other = t => t === 'X' ? 'O' : 'X';
+const LETTERS = ['أ','ب','ج','د'];
+const LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+const KEY = 'xo-classic-v1';
+
+function markSVG(t, draw){
+  if (t === 'X') return `<svg class="mark mx ${draw?'draw':''}" viewBox="0 0 100 100" aria-hidden="true"><path pathLength="100" d="M27 27 L73 73"/><path pathLength="100" d="M73 27 L27 73"/></svg>`;
+  return `<svg class="mark mo ${draw?'draw':''}" viewBox="0 0 100 100" aria-hidden="true"><circle pathLength="100" cx="50" cy="50" r="25"/></svg>`;
+}
+
+/* Storage: localStorage when available, in-memory fallback otherwise */
+const store = {
+  mem: {},
+  get(k){ try { return localStorage.getItem(k); } catch(e){ return this.mem[k] ?? null; } },
+  set(k, v){ try { localStorage.setItem(k, v); } catch(e){ this.mem[k] = v; } }
+};
+
+/* ================= default questions ================= */
+const mc = (q, opts, ans) => ({type:'mc', q, opts:[...opts,'','','',''].slice(0,4), ans, oral:''});
+const oral = (q, a) => ({type:'oral', q, opts:['','','',''], ans:0, oral:a});
+
+const DEFAULT_CATS = [
+  {name:'عام', qs:[
+    mc('كم عدد قارات العالم؟', ['٥','٦','٧','٨'], 2),
+    mc('ما أكبر محيط في العالم؟', ['الأطلسي','الهندي','الهادئ','المتجمد الشمالي'], 2),
+    mc('ما الحيوان الملقب بسفينة الصحراء؟', ['الحصان','الجمل','الفيل','الماعز'], 1)]},
+  {name:'عواصم', qs:[
+    mc('ما عاصمة اليابان؟', ['سيول','بكين','طوكيو','بانكوك'], 2),
+    mc('ما عاصمة مصر؟', ['الإسكندرية','القاهرة','الجيزة','أسوان'], 1),
+    mc('ما عاصمة تركيا؟', ['إسطنبول','أنقرة','إزمير','أنطاليا'], 1),
+    mc('ما عاصمة أستراليا؟', ['سيدني','ملبورن','كانبرا','بيرث'], 2)]},
+  {name:'الشرع', qs:[
+    mc('كم عدد ركعات صلاة الفجر؟', ['ركعتان','ثلاث ركعات','أربع ركعات','ركعة واحدة'], 0),
+    mc('ما الصلاة التي تُصلّى ثلاث ركعات؟', ['الظهر','العصر','المغرب','العشاء'], 2),
+    mc('ما ركن الإسلام الذي يجب على المستطيع؟', ['الصلاة','الصوم','الحج','الشهادتان'], 2)]},
+  {name:'الهرم', qs:[
+    oral('خمّنوا من التلميحات (تقرؤها المعلمة واحدًا تلو الآخر): ١- أنا كوكب. ٢- أنا الأقرب إلى الشمس. ٣- أنا أصغر كواكب المجموعة الشمسية.', 'عطارد'),
+    oral('خمّنوا من التلميحات: ١- أنا مدينة سعودية. ٢- فيّ المسجد النبوي. ٣- كان اسمي قديمًا يثرب.', 'المدينة المنورة'),
+    oral('خمّنوا من التلميحات: ١- أنا حيوان. ٢- أعيش في الماء وعلى اليابسة. ٣- أحمل بيتي على ظهري.', 'السلحفاة')]},
+  {name:'دين', qs:[
+    mc('ما أول سورة في المصحف الشريف؟', ['البقرة','الفاتحة','الإخلاص','الناس'], 1),
+    mc('من خاتم الأنبياء والمرسلين؟', ['موسى عليه السلام','عيسى عليه السلام','محمد ﷺ','إبراهيم عليه السلام'], 2),
+    mc('كم عدد سور القرآن الكريم؟', ['١١٤','١١٠','١٢٠','١٠٠'], 0)]},
+  {name:'صوتك', qs:[
+    oral('بصوت واحد: اذكروا خمسة من أسماء الله الحسنى.', 'مثل: الرحمن، الرحيم، الملك، القدوس، السلام'),
+    oral('اذكروا أسماء خمس فواكه بصوت مرتفع خلال عشر ثوانٍ.', 'أي خمس فواكه صحيحة'),
+    oral('انطقوا جملة «خيط حرير على حيط خليل» ثلاث مرات بسرعة دون خطأ.', 'الحكم للمعلمة')]},
+  {name:'XO', qs:[
+    mc('الحوت من الأسماك.', ['⭕ صح','❌ خطأ'], 1),
+    mc('يتجمد الماء عند صفر درجة مئوية.', ['⭕ صح','❌ خطأ'], 0),
+    mc('الشمس تدور حول الأرض.', ['⭕ صح','❌ خطأ'], 1)]},
+  {name:'الوقت', qs:[
+    mc('كم دقيقة في الساعة الواحدة؟', ['٦٠','١٠٠','٣٠','٢٤'], 0),
+    mc('كم عدد أشهر السنة الهجرية؟', ['١٠','١٢','١٣','١١'], 1),
+    mc('كم ساعة في اليوم الواحد؟', ['١٢','٢٠','٢٤','٣٠'], 2)]},
+  {name:'كورة', qs:[
+    mc('كم عدد لاعبي الفريق الواحد داخل الملعب في كرة القدم؟', ['٩','١٠','١١','١٢'], 2),
+    mc('أي منتخب فاز على الأرجنتين في كأس العالم ٢٠٢٢؟', ['السعودية','اليابان','مصر','تونس'], 0),
+    mc('كم مدة الشوط الواحد في مباراة كرة القدم؟', ['٣٠ دقيقة','٤٥ دقيقة','٦٠ دقيقة','٩٠ دقيقة'], 1),
+    mc('أي دولة ستستضيف كأس العالم ٢٠٣٤؟', ['قطر','السعودية','الإمارات','مصر'], 1)]}
+];
+
+function defaults(){
+  return {
+    cats: DEFAULT_CATS.map(c => ({name:c.name, limit:0, questions:c.qs.map(q => ({...q, opts:[...q.opts], id:uid()}))})),
+    timerOn: true, timerSec: 30, random: true, confirmMode: true,
+    teams: {X:'', O:''}, first: 'X'
+  };
+}
+function normQ(q){
+  return {
+    id: q.id || uid(),
+    type: q.type === 'oral' ? 'oral' : 'mc',
+    q: String(q.q || ''),
+    opts: [0,1,2,3].map(i => String((q.opts || [])[i] || '')),
+    ans: Math.min(3, Math.max(0, parseInt(q.ans) || 0)),
+    oral: String(q.oral || '')
+  };
+}
+function normalize(p, d){
+  const o = {...d, ...p};
+  if (!Array.isArray(p.cats) || p.cats.length !== 9) o.cats = d.cats;
+  else o.cats = p.cats.map((c, i) => ({
+    name: String(c.name || d.cats[i].name),
+    limit: Math.max(0, parseInt(c.limit) || 0),
+    questions: Array.isArray(c.questions) ? c.questions.map(normQ) : []
+  }));
+  o.teams = {X:'', O:'', ...(p.teams || {})};
+  o.first = p.first === 'O' ? 'O' : 'X';
+  o.timerSec = Math.min(300, Math.max(5, parseInt(o.timerSec) || 30));
+  ['timerOn','random','confirmMode'].forEach(k => o[k] = typeof p[k] === 'boolean' ? p[k] : d[k]);
+  return o;
+}
+function load(){
+  const d = defaults();
+  try { const raw = store.get(KEY); return raw ? normalize(JSON.parse(raw), d) : d; }
+  catch(e){ return d; }
+}
+let S = load();
+const save = () => store.set(KEY, JSON.stringify(S));
+
+function isValid(q){
+  if (!q.q.trim()) return false;
+  if (q.type === 'oral') return true;
+  return q.opts.filter(o => o.trim()).length >= 2 && !!q.opts[q.ans].trim();
+}
+function activeQs(ci){
+  const c = S.cats[ci];
+  const valid = c.questions.filter(isValid);
+  return c.limit > 0 ? valid.slice(0, c.limit) : valid;
+}
+const teamName = t => (S.teams[t] || '').trim() || (t === 'X' ? 'فريق X' : 'فريق O');
+
+/* ================= UI utilities ================= */
+function show(id){
+  ['start','game','editor'].forEach(s => $('#'+s).hidden = s !== id);
+  window.scrollTo(0,0);
+}
+let toastT;
+function toast(msg){
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role','status'); t.textContent = msg;
+  document.body.appendChild(t); clearTimeout(toastT); toastT = setTimeout(() => t.remove(), 2800);
+}
+let confirmCb = null;
+function askConfirm(msg, cb, okText = 'متابعة'){
+  $('#cMsg').textContent = msg; $('#cOk').textContent = okText; confirmCb = cb;
+  $('#confirm').hidden = false; $('#cOk').focus();
+}
+$('#cOk').onclick = () => { $('#confirm').hidden = true; const f = confirmCb; confirmCb = null; f && f(); };
+$('#cCancel').onclick = () => { $('#confirm').hidden = true; confirmCb = null; };
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#confirm').hidden) $('#cCancel').click(); });
+
+function confetti(){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const box = document.createElement('div'); box.className = 'confetti';
+  const cols = ['#93AE90','#8C5A36','#C9A27E','#4D6A52','#E2B866','#B9C9B4'];
+  for (let i = 0; i < 80; i++){
+    const s = document.createElement('i');
+    s.style.left = Math.random()*100 + '%';
+    s.style.background = cols[i % cols.length];
+    s.style.animationDelay = Math.random()*.7 + 's';
+    s.style.animationDuration = (2.2 + Math.random()*1.6) + 's';
+    box.appendChild(s);
+  }
+  document.body.appendChild(box); setTimeout(() => box.remove(), 4800);
+}
+
+/* ================= START SCREEN ================= */
+$('#heroX').innerHTML = markSVG('X', true);
+$('#heroO').innerHTML = markSVG('O', true);
+$('#leadX').insertAdjacentHTML('afterbegin', markSVG('X'));
+$('#leadO').insertAdjacentHTML('afterbegin', markSVG('O'));
+
+function fillStart(){
+  $('#teamX').value = S.teams.X; $('#teamO').value = S.teams.O;
+  $('#segX').innerHTML = markSVG('X') + `<span>${esc(teamName('X'))}</span>`;
+  $('#segO').innerHTML = markSVG('O') + `<span>${esc(teamName('O'))}</span>`;
+  $('#segX').setAttribute('aria-pressed', S.first === 'X');
+  $('#segO').setAttribute('aria-pressed', S.first === 'O');
+  $('#stTimerOn').checked = S.timerOn; $('#stTimerSec').value = S.timerSec;
+  $('#stTimerSec').disabled = !S.timerOn;
+}
+['X','O'].forEach(t => $('#team'+t).addEventListener('input', e => { S.teams[t] = e.target.value; save(); fillStartSeg(); }));
+function fillStartSeg(){
+  $('#segX span').textContent = teamName('X'); $('#segO span').textContent = teamName('O');
+}
+document.querySelectorAll('[data-first]').forEach(b => b.onclick = () => { S.first = b.dataset.first; save(); fillStart(); });
+$('#stTimerOn').onchange = e => { S.timerOn = e.target.checked; save(); fillStart(); };
+$('#stTimerSec').onchange = e => { S.timerSec = Math.min(300, Math.max(5, parseInt(e.target.value) || 30)); save(); fillStart(); };
+
+$('#startBtn').onclick = () => {
+  const empty = S.cats.map((c, i) => activeQs(i).length ? null : `«${c.name}»`).filter(Boolean);
+  if (empty.length){ toast('يلزم سؤال مكتمل واحد على الأقل في: ' + empty.join('، ')); return; }
+  newGame(false); show('game'); renderGame();
+};
+$('#toEditor').onclick = () => openEditor();
+
+/* ================= GAME ================= */
+let game = null, cur = null, tick = null;
+
+function newGame(keep){
+  const prev = game;
+  game = {
+    board: Array(9).fill(null), turn: S.first,
+    used: keep && prev ? prev.used : Array.from({length:9}, () => []),
+    undo: [], over: false, winner: null, line: null, lastPlaced: null,
+    wins: keep && prev ? prev.wins : {X:0, O:0}
+  };
+}
+
+$('#tmX').innerHTML = markSVG('X'); $('#tmO').innerHTML = markSVG('O');
+
+function renderGame(anim){
+  const g = game;
+  ['X','O'].forEach(t => {
+    $('#name'+t).textContent = teamName(t);
+    $('#cells'+t).textContent = g.board.filter(v => v === t).length;
+    $('#wins'+t).textContent = g.wins[t];
+    $('#card'+t).classList.toggle('active', !g.over && g.turn === t);
+  });
+  const pill = $('#turnPill');
+  pill.className = 'turn-pill' + (g.over ? '' : ' t' + g.turn);
+  pill.innerHTML = g.over
+    ? (g.winner ? `<span class="pm">${markSVG(g.winner)}</span> فاز <b>${esc(teamName(g.winner))}</b>` : 'انتهت الجولة بالتعادل')
+    : `<span class="pm">${markSVG(g.turn)}</span> الدور الآن: <b>${esc(teamName(g.turn))}</b>`;
+
+  const b = $('#board'); b.innerHTML = '';
+  g.board.forEach((v, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'cell' + (v ? ' taken' : '') + (g.line && g.line.includes(i) ? ' win' : '');
+    btn.style.setProperty('--tint', `var(--c${i})`);
+    const name = S.cats[i].name;
+    if (v){
+      btn.innerHTML = `<span class="label">${esc(name)}</span>${markSVG(v, anim && g.lastPlaced === i)}`;
+      btn.disabled = true;
+      btn.setAttribute('aria-label', `${name}: محجوز لـ ${teamName(v)}`);
+    } else {
+      btn.innerHTML = `<span class="label">${esc(name)}</span>`;
+      btn.disabled = g.over;
+      btn.onclick = () => openCell(i);
+    }
+    b.appendChild(btn);
+  });
+  if (anim) g.lastPlaced = null;
+  $('#undoBtn').disabled = !g.undo.length;
+  $('#swapBtn').disabled = g.over;
+}
+
+function pickQuestion(ci, excludeId){
+  const pool = activeQs(ci);
+  if (!pool.length) return null;
+  let avail = pool.filter(q => !game.used[ci].includes(q.id) && q.id !== excludeId);
+  if (!avail.length){
+    game.used[ci] = [];
+    avail = pool.filter(q => q.id !== excludeId);
+    if (!avail.length) avail = pool;
+  }
+  const q = S.random ? avail[Math.floor(Math.random() * avail.length)] : avail[0];
+  game.used[ci].push(q.id);
+  return q;
+}
+
+function openCell(i, q){
+  if (!game || game.over || game.board[i]) return;
+  const qq = q || pickQuestion(i);
+  if (!qq){ toast('لا توجد أسئلة مكتملة في هذا التصنيف'); return; }
+  cur = {cell:i, team:game.turn, q:qq, sel:null, revealed:false, done:false, result:null, reason:'', left:S.timerSec, paused:false};
+  $('#qModal').hidden = false; document.body.classList.add('lock');
+  renderQ(); startTimer();
+}
+
+/* timer */
+function startTimer(){
+  stopTimer();
+  cur.left = S.timerSec; cur.paused = false;
+  if (S.timerOn){
+    tick = setInterval(() => {
+      if (!cur || cur.paused || cur.done) return;
+      cur.left--; updateTimer();
+      if (cur.left <= 0) evaluate(false, 'timeout');
+    }, 1000);
+  }
+  updateTimer();
+}
+function stopTimer(){ clearInterval(tick); tick = null; }
+function updateTimer(){
+  const el = $('#qTimer');
+  if (!S.timerOn || !cur){ el.hidden = true; return; }
+  el.hidden = false;
+  const l = Math.max(0, cur.left);
+  $('#tNum').textContent = l;
+  $('#tFill').style.width = (l / S.timerSec * 100) + '%';
+  el.classList.toggle('low', l <= 5);
+  el.classList.toggle('paused', cur.paused || cur.done);
+}
+
+function renderQ(){
+  const c = cur, q = c.q, cat = S.cats[c.cell];
+  $('#qCat').textContent = cat.name; $('#qCat').style.setProperty('--tint', `var(--c${c.cell})`);
+  $('#qTeam').className = 'chip team-chip t' + c.team;
+  $('#qTeam').innerHTML = `${markSVG(c.team)}<span>${esc(teamName(c.team))}</span>`;
+  $('#qText').textContent = q.q;
+
+  const opts = $('#qOpts'); opts.innerHTML = '';
+  if (q.type === 'mc'){
+    opts.hidden = false; let n = 0;
+    const showAns = c.revealed || c.done;
+    q.opts.forEach((o, i) => {
+      if (!o.trim()) return;
+      const b = document.createElement('button');
+      b.className = 'opt';
+      if (c.sel === i) b.classList.add('sel');
+      if (showAns && i === q.ans) b.classList.add('correct');
+      if (c.done && c.sel === i && i !== q.ans) b.classList.add('wrong');
+      b.innerHTML = `<span class="ltr">${LETTERS[n++]}</span><span>${esc(o)}</span>`;
+      b.disabled = c.done || c.revealed;
+      b.onclick = () => {
+        c.sel = i;
+        if (!S.confirmMode) evaluate(i === q.ans); else renderQ();
+      };
+      opts.appendChild(b);
+    });
+  } else opts.hidden = true;
+
+  const ab = $('#qAnswer');
+  if (q.type === 'oral' && (c.revealed || c.done) && q.oral.trim()){
+    ab.hidden = false; ab.innerHTML = `<b>الإجابة:</b> ${esc(q.oral)}`;
+  } else ab.hidden = true;
+  $('#qOralNote').hidden = !(q.type === 'oral' && !c.done);
+
+  const act = $('#qActions'); act.innerHTML = '';
+  if (c.done){
+    const ok = c.result;
+    const msg = ok ? 'إجابة صحيحة! أحسنتم 🎉' : (c.reason === 'timeout' ? 'انتهى الوقت! حظًا أوفر' : 'إجابة غير صحيحة، حظًا أوفر!');
+    let sub;
+    if (ok && game.over && game.winner) sub = `أكمل ${teamName(c.team)} خطًا كاملًا!`;
+    else if (ok && game.over) sub = 'امتلأت اللوحة.';
+    else if (ok) sub = `حصل ${teamName(c.team)} على مربع «${cat.name}»، والدور الآن لـ ${teamName(other(c.team))}`;
+    else sub = `يبقى المربع متاحًا، والدور الآن لـ ${teamName(other(c.team))}`;
+    act.innerHTML = `<div class="fb ${ok?'ok':'bad'}" role="status"><strong>${msg}</strong><span>${esc(sub)}</span></div>
+      <button class="btn primary big" id="backBoard">العودة إلى اللوحة</button>`;
+    $('#backBoard').onclick = backToBoard;
+    setTimeout(() => $('#backBoard') && $('#backBoard').focus(), 60);
+  } else if (q.type === 'oral' || c.revealed){
+    act.innerHTML = `<p class="judge-hint">${q.type === 'oral' && !c.revealed ? 'بعد سماع إجابة الفريق، اختاري الحكم:' : 'احكمي على إجابة الفريق:'}</p>
+      <div class="judge"><button class="btn ok" id="jOk">إجابة صحيحة ✓</button><button class="btn bad" id="jBad">إجابة خاطئة ✗</button></div>`;
+    $('#jOk').onclick = () => evaluate(true);
+    $('#jBad').onclick = () => evaluate(false);
+  } else if (S.confirmMode){
+    act.innerHTML = `<button class="btn primary big" id="confirmAns" ${c.sel == null ? 'disabled' : ''}>تأكيد الإجابة</button>`;
+    $('#confirmAns').onclick = () => { if (c.sel != null) evaluate(c.sel === q.ans); };
+  }
+
+  $('#tools').hidden = c.done;
+  $('#tPause').hidden = !S.timerOn;
+  $('#tPause').textContent = c.paused ? 'استئناف المؤقت' : 'إيقاف المؤقت';
+  $('#tReveal').disabled = c.revealed;
+  updateTimer();
+}
+
+function checkEnd(t){
+  for (const L of LINES){
+    if (L.every(i => game.board[i] === t)){
+      game.over = true; game.winner = t; game.line = L; game.wins[t]++;
+      return;
+    }
+  }
+  if (game.board.every(Boolean)){ game.over = true; game.winner = null; game.line = null; }
+}
+
+function evaluate(correct, reason = ''){
+  const c = cur;
+  if (!c || c.done) return;
+  stopTimer();
+  game.undo.push({board:[...game.board], turn:game.turn, over:game.over, winner:game.winner, line:game.line, wins:{...game.wins}, cell:c.cell, qid:c.q.id});
+  c.done = true; c.result = correct; c.reason = reason;
+  if (correct){ game.board[c.cell] = c.team; game.lastPlaced = c.cell; checkEnd(c.team); }
+  game.turn = other(c.team);
+  renderQ();
+}
+
+function closeModal(){ stopTimer(); $('#qModal').hidden = true; document.body.classList.remove('lock'); cur = null; }
+function backToBoard(){
+  closeModal(); renderGame(true);
+  if (game.over) setTimeout(showResult, 1000);
+}
+
+/* teacher tools */
+$('#tPause').onclick = () => { if (!cur || cur.done) return; cur.paused = !cur.paused; renderQ(); };
+$('#tSkip').onclick = () => {
+  if (!cur || cur.done) return;
+  const old = cur.q.id, nq = pickQuestion(cur.cell, old);
+  if (!nq || nq.id === old){ toast('لا يوجد سؤال آخر في هذا التصنيف'); return; }
+  Object.assign(cur, {q:nq, sel:null, revealed:false});
+  startTimer(); renderQ();
+};
+$('#tReveal').onclick = () => { if (!cur || cur.done) return; cur.revealed = true; cur.paused = true; renderQ(); };
+$('#tRetry').onclick = () => { if (!cur || cur.done) return; Object.assign(cur, {sel:null, revealed:false}); startTimer(); renderQ(); };
+$('#tClose').onclick = () => { closeModal(); renderGame(); toast('أُغلق السؤال دون احتساب، والدور لم يتغير'); };
+
+/* game toolbar */
+function undo(){
+  if (!game || !game.undo.length) return;
+  askConfirm('التراجع عن آخر إجابة وإعادة فتح سؤالها؟ لن تُحتسب نتيجتها السابقة.', () => {
+    const s = game.undo.pop();
+    Object.assign(game, {board:s.board, turn:s.turn, over:s.over, winner:s.winner, line:s.line, wins:s.wins, lastPlaced:null});
+    $('#result').hidden = true;
+    document.querySelectorAll('.confetti').forEach(c => c.remove());
+    renderGame();
+    const q = S.cats[s.cell].questions.find(x => x.id === s.qid && isValid(x));
+    openCell(s.cell, q);
+  }, 'تراجع');
+}
+$('#undoBtn').onclick = undo;
+$('#rUndo').onclick = undo;
+$('#swapBtn').onclick = () => { if (game.over) return; game.turn = other(game.turn); renderGame(); toast('الدور الآن لـ ' + teamName(game.turn)); };
+$('#newRoundBtn').onclick = () => {
+  const started = game.board.some(Boolean);
+  const go = () => { newGame(true); renderGame(); };
+  if (started && !game.over) askConfirm('بدء جولة جديدة؟ ستُمسح اللوحة الحالية مع الاحتفاظ بالأسئلة والفرق.', go, 'جولة جديدة'); else go();
+};
+$('#resetBtn').onclick = () => askConfirm('إعادة ضبط اللعبة؟ سيُمسح تقدم اللوحة ونتائج الجولات. الأسئلة المحفوظة لن تتأثر.', () => {
+  game = null; fillStart(); show('start');
+}, 'إعادة الضبط');
+$('#settingsBtn').onclick = () => openEditor();
+$('#fsBtn').onclick = () => {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => toast('ملء الشاشة غير متاح هنا'));
+  else document.exitFullscreen?.();
+};
+document.addEventListener('fullscreenchange', () => $('#fsBtn').textContent = document.fullscreenElement ? 'إنهاء ملء الشاشة' : 'ملء الشاشة');
+
+/* result */
+function showResult(){
+  if (!game || !game.over) return;
+  const w = game.winner;
+  $('#rMarks').innerHTML = w ? markSVG(w, true) : markSVG('X', true) + markSVG('O', true);
+  $('#rTitle').textContent = w ? `فاز ${teamName(w)}!` : 'تعادل الفريقان! جولة جديدة؟';
+  $('#rSub').textContent = w ? 'ثلاثة رموز على خط واحد، أحسنتم!' : 'امتلأت اللوحة دون خط فائز.';
+  $('#rScores').innerHTML = ['X','O'].map(t => `
+    <div class="score t${t} ${w === t ? 'won' : ''}">
+      <div class="sn">${esc(teamName(t))}</div>
+      <div class="sv">${game.board.filter(v => v === t).length}</div>
+      <div class="sl">مربعات هذه الجولة · ${game.wins[t]} جولات فوز</div>
+    </div>`).join('');
+  $('#result').hidden = false; $('#rAgain').focus();
+  if (w) confetti();
+}
+$('#rAgain').onclick = () => { $('#result').hidden = true; newGame(true); renderGame(); };
+$('#rSetup').onclick = () => { $('#result').hidden = true; game = null; fillStart(); show('start'); };
+
+/* ================= EDITOR ================= */
+let edCat = 0;
+function openEditor(){ renderEditor(); show('editor'); }
+$('#edBack').onclick = () => {
+  if (game){ show('game'); renderGame(); } else { fillStart(); show('start'); }
+};
+
+function renderEditor(){
+  $('#edTimerOn').checked = S.timerOn; $('#edTimerSec').value = S.timerSec; $('#edTimerSec').disabled = !S.timerOn;
+  $('#edRandom').checked = S.random; $('#edConfirm').checked = S.confirmMode;
+  renderTabs(); renderPanel();
+}
+$('#edTimerOn').onchange = e => { S.timerOn = e.target.checked; save(); renderEditor(); };
+$('#edTimerSec').onchange = e => { S.timerSec = Math.min(300, Math.max(5, parseInt(e.target.value) || 30)); e.target.value = S.timerSec; save(); };
+$('#edRandom').onchange = e => { S.random = e.target.checked; save(); };
+$('#edConfirm').onchange = e => { S.confirmMode = e.target.checked; save(); };
+
+function renderTabs(){
+  const t = $('#tabs'); t.innerHTML = '';
+  S.cats.forEach((c, i) => {
+    const b = document.createElement('button');
+    b.className = 'tab' + (i === edCat ? ' on' : '');
+    b.style.setProperty('--tint', `var(--c${i})`);
+    b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', i === edCat);
+    const n = c.questions.filter(isValid).length;
+    b.innerHTML = `<span class="tname">${esc(c.name.trim() || 'بدون اسم')}</span><span class="tcount ${n ? '' : 'empty'}">${n ? n + ' سؤال' : 'لا أسئلة'}</span>`;
+    b.onclick = () => { edCat = i; renderTabs(); renderPanel(); };
+    t.appendChild(b);
+  });
+}
+
+function qHTML(q, qi){
+  const ok = isValid(q);
+  const body = q.type === 'mc'
+    ? `<div class="opts-ed">${q.opts.map((o, i) => `
+        <label class="opt-ed"><input type="radio" name="ans-${q.id}" data-f="ans" value="${i}" ${q.ans === i ? 'checked' : ''} aria-label="اجعليها الإجابة الصحيحة">
+        <input data-f="opt" data-i="${i}" value="${esc(o)}" placeholder="الخيار ${LETTERS[i]}${i > 1 ? ' (اختياري)' : ''}"></label>`).join('')}</div>
+       <p class="hint">اختاري الدائرة بجانب الإجابة الصحيحة. يكفي خياران لأسئلة صح أم خطأ.</p>`
+    : `<input data-f="oral" value="${esc(q.oral)}" placeholder="الإجابة النموذجية (تظهر عند الضغط على إظهار الإجابة)">`;
+  return `<div class="qitem ${ok ? '' : 'invalid'}" data-qi="${qi}">
+    <div class="qi-head"><b>سؤال ${qi + 1}</b>
+      <select data-f="type" aria-label="نوع السؤال">
+        <option value="mc" ${q.type === 'mc' ? 'selected' : ''}>اختيار من متعدد</option>
+        <option value="oral" ${q.type === 'oral' ? 'selected' : ''}>شفهي</option>
+      </select>
+      <span class="qi-warn">${ok ? '' : 'غير مكتمل، لن يظهر في اللعب'}</span>
+      <button class="btn small danger" data-act="del">حذف</button>
+    </div>
+    <textarea data-f="q" rows="2" placeholder="نص السؤال">${esc(q.q)}</textarea>
+    ${body}
+  </div>`;
+}
+
+function renderPanel(){
+  const c = S.cats[edCat], p = $('#panel');
+  const valid = c.questions.filter(isValid).length;
+  let lim = `<option value="0">كل الأسئلة المكتملة (${valid})</option>`;
+  for (let k = 1; k < valid; k++) lim += `<option value="${k}" ${c.limit === k ? 'selected' : ''}>أول ${k} فقط</option>`;
+  p.innerHTML = `
+    <div class="panel-head">
+      <label class="field grow"><span>اسم التصنيف (المربع ${edCat + 1})</span><input id="catName" value="${esc(c.name)}" maxlength="28"></label>
+      <label class="field"><span>عدد الأسئلة المستخدمة في اللعب</span><select id="catLimit">${lim}</select></label>
+    </div>
+    <div id="qList">${c.questions.map(qHTML).join('') || '<p class="empty-note">لا توجد أسئلة في هذا التصنيف بعد. أضيفي سؤالًا ليظهر عند اختيار المربع.</p>'}</div>
+    <button class="btn primary" id="addQ">+ إضافة سؤال</button>`;
+}
+
+function refreshItem(item, q){
+  const ok = isValid(q);
+  item.classList.toggle('invalid', !ok);
+  item.querySelector('.qi-warn').textContent = ok ? '' : 'غير مكتمل، لن يظهر في اللعب';
+}
+
+$('#panel').addEventListener('input', e => {
+  const c = S.cats[edCat], t = e.target;
+  if (t.id === 'catName'){ c.name = t.value; save(); renderTabs(); return; }
+  const item = t.closest('.qitem'); if (!item) return;
+  const q = c.questions[+item.dataset.qi], f = t.dataset.f;
+  if (f === 'q') q.q = t.value;
+  else if (f === 'opt') q.opts[+t.dataset.i] = t.value;
+  else if (f === 'oral') q.oral = t.value;
+  else return;
+  save(); refreshItem(item, q); renderTabs();
+});
+$('#panel').addEventListener('change', e => {
+  const c = S.cats[edCat], t = e.target;
+  if (t.id === 'catLimit'){ c.limit = +t.value; save(); return; }
+  if (t.id === 'catName'){ if (!c.name.trim()){ c.name = 'تصنيف ' + (edCat + 1); save(); renderTabs(); renderPanel(); } return; }
+  const item = t.closest('.qitem'); if (!item) return;
+  const q = c.questions[+item.dataset.qi];
+  if (t.dataset.f === 'type'){ q.type = t.value; save(); renderPanel(); renderTabs(); }
+  else if (t.dataset.f === 'ans'){ q.ans = +t.value; save(); refreshItem(item, q); renderTabs(); }
+});
+$('#panel').addEventListener('click', e => {
+  const c = S.cats[edCat];
+  if (e.target.id === 'addQ'){
+    c.questions.push({id:uid(), type:'mc', q:'', opts:['','','',''], ans:0, oral:''});
+    save(); renderPanel(); renderTabs();
+    const tas = document.querySelectorAll('#qList textarea'); tas[tas.length - 1]?.focus();
+    return;
+  }
+  const del = e.target.closest('[data-act="del"]');
+  if (del){
+    const qi = +del.closest('.qitem').dataset.qi;
+    askConfirm('حذف هذا السؤال نهائيًا؟', () => {
+      c.questions.splice(qi, 1);
+      if (c.limit >= c.questions.filter(isValid).length) c.limit = 0;
+      save(); renderPanel(); renderTabs();
+    }, 'حذف');
+  }
+});
+
+$('#exportBtn').onclick = () => {
+  const data = {app:'xo-challenge', version:1, cats:S.cats, timerOn:S.timerOn, timerSec:S.timerSec, random:S.random, confirmMode:S.confirmMode};
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'xo-challenge-questions.json';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+$('#importBtn').onclick = () => $('#importFile').click();
+$('#importFile').onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const p = JSON.parse(r.result);
+      if (!Array.isArray(p.cats) || p.cats.length !== 9) throw new Error();
+      askConfirm('استبدال التصنيفات والأسئلة الحالية بأسئلة الملف؟', () => {
+        const teams = S.teams, first = S.first;
+        S = normalize({...p, teams, first}, defaults()); save(); edCat = 0; renderEditor(); toast('تم استيراد الأسئلة');
+      }, 'استيراد');
+    } catch(err){ toast('الملف غير صالح. استخدمي ملفًا صدّرته هذه اللعبة'); }
+    e.target.value = '';
+  };
+  r.readAsText(f);
+};
+$('#defaultsBtn').onclick = () => askConfirm('استبدال كل التصنيفات والأسئلة بالأسئلة التجريبية؟ ستُحذف أسئلتك الحالية.', () => {
+  S.cats = defaults().cats; save(); edCat = 0; renderEditor(); toast('تمت استعادة الأسئلة التجريبية');
+}, 'استعادة');
+
+/* init */
+fillStart();
+</script>
+</body>
+</html>
