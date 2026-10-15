@@ -241,6 +241,49 @@ button{cursor:pointer}
   .timer{min-width:110px}
   .cell{border-radius:14px}
 }
+
+/* ===== cheerful palette + square cells ===== */
+:root{
+  --v0:#FFD3B6; --v1:#BDE7FF; --v2:#C9F2C7; --v3:#FFE59A; --v4:#E3D4FF;
+  --v5:#FFC8DD; --v6:#B4F0E6; --v7:#FFD6A0; --v8:#CFE0FF;
+  --cell-ink:#2B1F16; --mx:#E8462A; --mo:#1F6FD6;
+  --x:#E8462A; --o:#1F6FD6; --x-soft:#FFE1D8; --o-soft:#DCEBFF;
+  --sage-d:#1E9E63; --brown:#E0662A; --sand:#F4E9D6;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --x:#FF7B5E; --o:#5EA8FF; --x-soft:#4A2A22; --o-soft:#1D3352;
+    --sage-d:#4FD495; --brown:#FF9A5C; --sand:#2F261F;
+  }
+}
+.board{aspect-ratio:auto;grid-template-rows:none;align-content:start}
+.board .cell{aspect-ratio:1/1;min-width:0;min-height:0;overflow:hidden;background:var(--tint);color:var(--cell-ink);
+  font-size:clamp(14px,3.6vw,28px);box-shadow:inset 0 -5px 0 rgba(0,0,0,.08)}
+.board .cell.taken{background:var(--tint)}
+.board .cell.taken .label{opacity:.35}
+.board .cell .mark{position:absolute;inset:0;width:100%;height:100%;transform:scale(1.75);transform-origin:50% 50%;stroke-width:6.5}
+.board .cell .mark.mx{stroke:var(--mx)} .board .cell .mark.mo{stroke:var(--mo)}
+.board .cell.win{box-shadow:0 0 0 4px var(--cell-ink) inset}
+.board .cell:hover:not(:disabled){border-color:var(--cell-ink)}
+.chip{color:var(--cell-ink)}
+.team-chip.tX,.team-chip.tO{color:inherit}
+
+/* ===== turquoise instead of brown ===== */
+:root{
+  --bg:#F1FAF9; --paper:#FFFFFF; --sand:#DCF2F0; --line:#BCE3DF;
+  --ink:#0F2F35; --muted:#4D6F74; --cell-ink:#13343A;
+  --brown:#0FA3A0; --brown-l:#7FD3CF; --sage-d:#0E9895; --on-primary:#FFFFFF;
+  --shadow:0 1px 0 rgba(10,60,64,.06), 0 10px 26px -14px rgba(10,60,64,.35);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0D1E21; --paper:#14292D; --sand:#1A3438; --line:#27484D;
+    --ink:#E4F6F4; --muted:#9BC2C3;
+    --brown:#3FD8D0; --brown-l:#2A7F7B; --x-soft:#4A1F2A; --sage-d:#3FD8D0; --on-primary:#0D1E21;
+    --shadow:0 1px 0 rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.7);
+  }
+}
+.overlay{background:rgba(6,30,34,.55)}
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}
   .draw path,.draw circle{stroke-dashoffset:0}
@@ -553,7 +596,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#confi
 function confetti(){
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const box = document.createElement('div'); box.className = 'confetti';
-  const cols = ['#93AE90','#8C5A36','#C9A27E','#4D6A52','#E2B866','#B9C9B4'];
+  const cols = ['#1FB5B0','#FF7B5E','#5EA8FF','#FFC93C','#7ADFA0','#FF9CC2'];
   for (let i = 0; i < 80; i++){
     const s = document.createElement('i');
     s.style.left = Math.random()*100 + '%';
@@ -631,10 +674,10 @@ function renderGame(anim){
   g.board.forEach((v, i) => {
     const btn = document.createElement('button');
     btn.className = 'cell' + (v ? ' taken' : '') + (g.line && g.line.includes(i) ? ' win' : '');
-    btn.style.setProperty('--tint', `var(--c${i})`);
+    btn.style.setProperty('--tint', `var(--v${i})`);
     const name = S.cats[i].name;
     if (v){
-      btn.innerHTML = `${markSVG(v, anim && g.lastPlaced === i)}<span class="cname">${esc(name)}</span>`;
+      btn.innerHTML = `<span class="label">${esc(name)}</span>${markSVG(v, anim && g.lastPlaced === i)}`;
       btn.disabled = true;
       btn.setAttribute('aria-label', `${name}: محجوز لـ ${teamName(v)}`);
     } else {
@@ -699,7 +742,7 @@ function updateTimer(){
 
 function renderQ(){
   const c = cur, q = c.q, cat = S.cats[c.cell];
-  $('#qCat').textContent = cat.name; $('#qCat').style.setProperty('--tint', `var(--c${c.cell})`);
+  $('#qCat').textContent = cat.name; $('#qCat').style.setProperty('--tint', `var(--v${c.cell})`);
   $('#qTeam').className = 'chip team-chip t' + c.team;
   $('#qTeam').innerHTML = `${markSVG(c.team)}<span>${esc(teamName(c.team))}</span>`;
   $('#qText').textContent = q.q;
@@ -875,7 +918,7 @@ function renderTabs(){
   S.cats.forEach((c, i) => {
     const b = document.createElement('button');
     b.className = 'tab' + (i === edCat ? ' on' : '');
-    b.style.setProperty('--tint', `var(--c${i})`);
+    b.style.setProperty('--tint', `var(--v${i})`);
     b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', i === edCat);
     const n = c.questions.filter(isValid).length;
     b.innerHTML = `<span class="tname">${esc(c.name.trim() || 'بدون اسم')}</span><span class="tcount ${n ? '' : 'empty'}">${n ? n + ' سؤال' : 'لا أسئلة'}</span>`;
