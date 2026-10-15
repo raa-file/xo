@@ -284,6 +284,10 @@ button{cursor:pointer}
   }
 }
 .overlay{background:rgba(6,30,34,.55)}
+.buzz{display:inline-flex;align-items:center;gap:10px;font-size:1.2rem!important;padding:.7em 1.6em!important;border-width:3px}
+.buzz svg{width:30px;height:30px}
+.buzz.tX{border-color:var(--x);background:var(--x-soft)} .buzz.tO{border-color:var(--o);background:var(--o-soft)}
+.turn-pill{font-size:clamp(15px,1.8vw,20px)}
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}
   .draw path,.draw circle{stroke-dashoffset:0}
@@ -312,7 +316,7 @@ button{cursor:pointer}
       </div>
 
       <div class="opt-line">
-        <div class="row">
+        <div class="row" hidden>
           <span class="label-sm">يبدأ أولًا:</span>
           <div class="seg" role="group" aria-label="الفريق الذي يبدأ">
             <button type="button" data-first="X" id="segX"></button>
@@ -339,7 +343,7 @@ button{cursor:pointer}
     <div class="brand">تحدي X O</div>
     <div class="turn-pill" id="turnPill" aria-live="polite"></div>
     <div class="tools-row">
-      <button class="btn small" id="swapBtn" title="تغيير الفريق صاحب الدور">تبديل الدور</button>
+      <button class="btn small" id="swapBtn" hidden title="تغيير الفريق صاحب الدور">تبديل الدور</button>
       <button class="btn small" id="undoBtn">تراجع عن آخر إجابة</button>
       <button class="btn small" id="newRoundBtn">جولة جديدة</button>
       <button class="btn small" id="settingsBtn">الأسئلة</button>
@@ -662,13 +666,13 @@ function renderGame(anim){
     $('#name'+t).textContent = teamName(t);
     $('#cells'+t).textContent = g.board.filter(v => v === t).length;
     $('#wins'+t).textContent = g.wins[t];
-    $('#card'+t).classList.toggle('active', !g.over && g.turn === t);
+    $('#card'+t).classList.remove('active');
   });
   const pill = $('#turnPill');
-  pill.className = 'turn-pill' + (g.over ? '' : ' t' + g.turn);
+  pill.className = 'turn-pill';
   pill.innerHTML = g.over
     ? (g.winner ? `<span class="pm">${markSVG(g.winner)}</span> فاز <b>${esc(teamName(g.winner))}</b>` : 'انتهت الجولة بالتعادل')
-    : `<span class="pm">${markSVG(g.turn)}</span> الدور الآن: <b>${esc(teamName(g.turn))}</b>`;
+    : `⚡ اختاروا مربعًا، والأسرع في الإجابة يأخذه`;
 
   const b = $('#board'); b.innerHTML = '';
   g.board.forEach((v, i) => {
@@ -689,7 +693,6 @@ function renderGame(anim){
   });
   if (anim) g.lastPlaced = null;
   $('#undoBtn').disabled = !g.undo.length;
-  $('#swapBtn').disabled = g.over;
 }
 
 function pickQuestion(ci, excludeId){
@@ -710,7 +713,7 @@ function openCell(i, q){
   if (!game || game.over || game.board[i]) return;
   const qq = q || pickQuestion(i);
   if (!qq){ toast('لا توجد أسئلة مكتملة في هذا التصنيف'); return; }
-  cur = {cell:i, team:game.turn, q:qq, sel:null, revealed:false, done:false, result:null, reason:'', left:S.timerSec, paused:false};
+  cur = {cell:i, team:null, tried:[], wrong:[], q:qq, sel:null, revealed:false, done:false, result:null, reason:'', left:S.timerSec, paused:false};
   $('#qModal').hidden = false; document.body.classList.add('lock');
   renderQ(); startTimer();
 }
@@ -743,8 +746,13 @@ function updateTimer(){
 function renderQ(){
   const c = cur, q = c.q, cat = S.cats[c.cell];
   $('#qCat').textContent = cat.name; $('#qCat').style.setProperty('--tint', `var(--v${c.cell})`);
-  $('#qTeam').className = 'chip team-chip t' + c.team;
-  $('#qTeam').innerHTML = `${markSVG(c.team)}<span>${esc(teamName(c.team))}</span>`;
+  if (c.team){
+    $('#qTeam').className = 'chip team-chip t' + c.team;
+    $('#qTeam').innerHTML = `${markSVG(c.team)}<span>يجيب: ${esc(teamName(c.team))}</span>`;
+  } else {
+    $('#qTeam').className = 'chip team-chip';
+    $('#qTeam').innerHTML = c.done ? '<span>لم يحصل أحد على المربع</span>' : '<span>⚡ الأسرع يجاوب</span>';
+  }
   $('#qText').textContent = q.q;
 
   const opts = $('#qOpts'); opts.innerHTML = '';
@@ -757,9 +765,9 @@ function renderQ(){
       b.className = 'opt';
       if (c.sel === i) b.classList.add('sel');
       if (showAns && i === q.ans) b.classList.add('correct');
-      if (c.done && c.sel === i && i !== q.ans) b.classList.add('wrong');
+      if (c.wrong.includes(i) || (c.done && c.sel === i && i !== q.ans)) b.classList.add('wrong');
       b.innerHTML = `<span class="ltr">${LETTERS[n++]}</span><span>${esc(o)}</span>`;
-      b.disabled = c.done || c.revealed;
+      b.disabled = c.done || c.revealed || !c.team || c.wrong.includes(i);
       b.onclick = () => {
         c.sel = i;
         if (!S.confirmMode) evaluate(i === q.ans); else renderQ();
@@ -781,12 +789,19 @@ function renderQ(){
     let sub;
     if (ok && game.over && game.winner) sub = `أكمل ${teamName(c.team)} خطًا كاملًا!`;
     else if (ok && game.over) sub = 'امتلأت اللوحة.';
-    else if (ok) sub = `حصل ${teamName(c.team)} على مربع «${cat.name}»، والدور الآن لـ ${teamName(other(c.team))}`;
-    else sub = `يبقى المربع متاحًا، والدور الآن لـ ${teamName(other(c.team))}`;
+    else if (ok) sub = `حصل ${teamName(c.team)} على مربع «${cat.name}»`;
+    else sub = 'لم يحصل أي فريق على المربع، ويبقى متاحًا للجولة القادمة';
     act.innerHTML = `<div class="fb ${ok?'ok':'bad'}" role="status"><strong>${msg}</strong><span>${esc(sub)}</span></div>
       <button class="btn primary big" id="backBoard">العودة إلى اللوحة</button>`;
     $('#backBoard').onclick = backToBoard;
     setTimeout(() => $('#backBoard') && $('#backBoard').focus(), 60);
+  } else if (!c.team){
+    const left = ['X','O'].filter(t => !c.tried.includes(t));
+    const note = c.tried.length ? `أخطأ ${teamName(c.tried[0])}، والفرصة الآن لـ ${teamName(left[0])}` : 'أي فريق رفع يده أولًا؟';
+    act.innerHTML = `<p class="judge-hint">${esc(note)}</p><div class="judge">` +
+      left.map(t => `<button class="btn big buzz t${t}" data-buzz="${t}">${markSVG(t)}<span>${esc(teamName(t))}${c.tried.length ? ' يجيب' : ' أسرع'}</span></button>`).join('') +
+      `</div>`;
+    act.querySelectorAll('[data-buzz]').forEach(b => b.onclick = () => { c.team = b.dataset.buzz; c.sel = null; renderQ(); });
   } else if (q.type === 'oral' || c.revealed){
     act.innerHTML = `<p class="judge-hint">${q.type === 'oral' && !c.revealed ? 'بعد سماع إجابة الفريق، اختاري الحكم:' : 'احكمي على إجابة الفريق:'}</p>
       <div class="judge"><button class="btn ok" id="jOk">إجابة صحيحة ✓</button><button class="btn bad" id="jBad">إجابة خاطئة ✗</button></div>`;
@@ -817,13 +832,19 @@ function checkEnd(t){
 function evaluate(correct, reason = ''){
   const c = cur;
   if (!c || c.done) return;
+  if (!correct && reason !== 'timeout' && c.team){
+    c.tried.push(c.team);
+    if (c.sel != null && q_isMc(c)) c.wrong.push(c.sel);
+    if (c.tried.length < 2){ c.team = null; c.sel = null; c.revealed = false; startTimer(); renderQ(); return; }
+  }
   stopTimer();
   game.undo.push({board:[...game.board], turn:game.turn, over:game.over, winner:game.winner, line:game.line, wins:{...game.wins}, cell:c.cell, qid:c.q.id});
   c.done = true; c.result = correct; c.reason = reason;
+  if (!correct) c.team = null;
   if (correct){ game.board[c.cell] = c.team; game.lastPlaced = c.cell; checkEnd(c.team); }
-  game.turn = other(c.team);
   renderQ();
 }
+function q_isMc(c){ return c.q.type === 'mc'; }
 
 function closeModal(){ stopTimer(); $('#qModal').hidden = true; document.body.classList.remove('lock'); cur = null; }
 function backToBoard(){
@@ -837,12 +858,12 @@ $('#tSkip').onclick = () => {
   if (!cur || cur.done) return;
   const old = cur.q.id, nq = pickQuestion(cur.cell, old);
   if (!nq || nq.id === old){ toast('لا يوجد سؤال آخر في هذا التصنيف'); return; }
-  Object.assign(cur, {q:nq, sel:null, revealed:false});
+  Object.assign(cur, {q:nq, sel:null, revealed:false, team:null, tried:[], wrong:[]});
   startTimer(); renderQ();
 };
 $('#tReveal').onclick = () => { if (!cur || cur.done) return; cur.revealed = true; cur.paused = true; renderQ(); };
-$('#tRetry').onclick = () => { if (!cur || cur.done) return; Object.assign(cur, {sel:null, revealed:false}); startTimer(); renderQ(); };
-$('#tClose').onclick = () => { closeModal(); renderGame(); toast('أُغلق السؤال دون احتساب، والدور لم يتغير'); };
+$('#tRetry').onclick = () => { if (!cur || cur.done) return; Object.assign(cur, {sel:null, revealed:false, team:null, tried:[], wrong:[]}); startTimer(); renderQ(); };
+$('#tClose').onclick = () => { closeModal(); renderGame(); toast('أُغلق السؤال دون احتساب'); };
 
 /* game toolbar */
 function undo(){
